@@ -1,0 +1,121 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="css/m_cover.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+
+<!------ Include the above in your HEAD tag ---------->
+<!--Author      : @arboshiki-->
+<div id="invoice">
+    <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    	  <div class="modal-dialog">
+				<div class="loginmodal-container">
+					<h1>Enter Transaction Detail</h1><br>
+				  <form>
+					<input type="text" name="name" placeholder="Name">
+					<input type="text" name="account" placeholder="Account">
+                      <input type="text" name="amount" placeholder="Amount">
+                      <form>
+                       <input type="radio" name="selectedAccount" placeholder="Access Advantage"> Access Advantage <br>
+                       <input type="radio" name="selectedAccount" placeholder="Online Saver"> Online Saver <br>
+                        <input type="radio" name="selectedAccount" placeholder="Progress Saver">Progress Saver <br>
+                        </form>
+					<input type="submit" name="login" class="login loginmodal-submit" value="Confirm">
+				  </form>
+				</div>
+			</div>
+		  </div>
+    
+    <div class="invoice overflow-auto">
+        <div style="min-width: 600px">
+            <header>
+                <div class="row">
+                    <div class="col">
+                        <h1  style="margin-left:20px;">  E-Banking </h1> &nbsp;&nbsp;&nbsp;&nbsp;
+                        <button id="transfer money" class="btn btn-primary active" data-toggle="modal" data-target="#login-modal"><i class="fa fa-print" ></i> Transfer</button>
+            <button  class="btn btn-primary active"><i class="fa fa-file-pdf-o"></i> Transaction history</button>
+                    </div>
+                </div>
+            </header>
+            <main>
+                <div class="row contacts" style="margin-left:10px;">
+                    <div class="col invoice-to">
+                        <div class="text-gray-light"></div>
+                        <h2 class="to">User name</h2>
+                        <div>Account Number : 12345567</div>
+                    </div>
+                </div>
+                <table border="0" cellspacing="0" cellpadding="0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th class="text-left">Account Number</th>
+                            <th class="text-right">Available</th>
+                            <th class="text-right">Current</th>
+                            <th class="text-right">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="no">01</td>
+                            <td class="text-left"><h3>
+                                <a target="_blank">
+                                Access Advantage : 12345567
+                                </a>
+                                </h3>
+                               Interest rate : 0%
+                            </td>
+                            <td class="unit">$0.00</td>
+                            <td class="qty">$0.00</td>
+                            <td class="total">$0.00</td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="no">02</td>
+                            <td class="text-left"><h3>
+                                <a target="_blank">
+                                Online Saver : 12345567
+                                </a>
+                                </h3>
+                               Interest rate : 2.5%
+                            </td>
+                            <td class="unit">$0.00</td>
+                            <td class="qty">$0.00</td>
+                            <td class="total">$0.00</td>
+                        </tr>
+                        <tr>
+                            <td class="no">03</td>
+                            <td class="text-left"><h3>
+                                <a target="_blank">
+                                Progress Saver : 12345567
+                                </a>
+                                </h3>
+                               Interest rate : 2.9%
+                            </td>
+                            <td class="unit">$0.00</td>
+                            <td class="qty">$0.00</td>
+                            <td class="total">$0.00</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        
+                        <tr>
+                            <td colspan="2"></td>
+                            <td colspan="2">TOTAL</td>
+                            <td>0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                
+                <div class="notices">
+                    <div>DEAR Customer:</div>
+                    <div class="notice">Welcome to use our service</div>
+                </div>
+            </main>
+            <footer>
+               COMP90020 online banking system
+            </footer>
+        </div>
+        <!--DO NOT DELETE THIS div. IT is responsible for showing footer always at the bottom-->
+        <div></div>
+    </div>
