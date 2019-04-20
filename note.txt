@@ -1,0 +1,20 @@
+All servers - ip:port
+
+Initial server - Coordinator (isCoor = True)
+New server - try to connect others - or initial server
+             wait - Coordinator or election
+             record all server IDs
+
+
+critical section access - send request to Coordinator
+                        - request queue
+                        - reply token
+                        - return token
+                        - next request in queue
+
+Coordinator crashed - who detected the crash would send out election msg
+
+Send Election - announce election msg to larger IDs
+              - wait for answer / coordinator
+
+Receive Election - answer - Initiate Election
