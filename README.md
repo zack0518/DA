@@ -2,14 +2,14 @@
 
 USAGE:
 
-'''bash
+```bash
 [comment]: # ( Default port started from 20000 )
 python server.py
 
-'''
+```
 
-'''bash
+```bash
 [comment]: # ( or specify port )
 python server.py 20001
 
-'''
+```
