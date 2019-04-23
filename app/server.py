@@ -46,28 +46,22 @@ class ServerThread(Thread):
         self.outThreads = d
 
     def process(self, jsonMsg, inThread):
-        print(jsonMsg)
-        try:
-            msg = json.loads(jsonMsg)
-        except:
-            print("msg")
+        msg = json.loads(jsonMsg)
         ip = inThread.ip
         port = inThread.port
         cmd = msg['cmd']
-        print(cmd == 'save_id')
         if cmd == 'save_id':
             self.idRecord[(ip,port)] = msg['id']
-            print(self.isCo)
             if self.isCo:
                 resMsg = {}
                 resMsg['cmd'] = 'set_co'
                 resMsg['co'] = self.port
-                print(resMsg['co'])
-                try:
-                    inThread.send(json.dumps(resMsg).encode())
-                except:
-                    print('!!!!!!!')
-        #elif cmd == ''
+                inThread.send(json.dumps(resMsg).encode())
+        elif cmd == 'set_co':
+
+        #elif cmd == 'req_token':
+        
+        #elif cmd == 'rel_token:'
 
 class InThread(Thread):
     def __init__(self, ip, port, sock, server):
@@ -116,8 +110,12 @@ class OutThread(Thread):
             print('Could not connect to {}.{}'.format(self.host, self.port))
             thread.exit()
         print('Connection request -> {}:{}'.format(self.host,self.port))
-        msg = "{'cmd':'save_id', 'id':'" + str(self.port) + "'}"
-        self.sock.sendall(msg.encode())
+        #msg = "{\"cmd\":\"save_id\", \"id\":\"" + str(self.port) + "\"}"
+        msg = {}
+        msg['cmd'] = 'save_id'
+        msg['id'] = str(self.port)
+        #self.sock.sendall(msg.encode())
+        self.sock.sendall(json.dumps(msg).encode())
         i = 0
         while True:
             try:
