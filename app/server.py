@@ -1,24 +1,25 @@
-import socket
+import socket, time
 from threading import Thread
 
 class ServerThread(Thread):
     threads = {}
     outThreads = {}
-    def __init__(self, ip, port):
+    def __init__(self, ip, port, outList=[]):
         Thread.__init__(self)
         self.tcpServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.tcpServer.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.tcpServer.bind((SERVER_IP, SERVER_PORT))
+        self.outList = outList
 
     def run(self):
         print('[+] New server thread start')
-        '''
-        for _ in outList:
-            oThread = OutThread()
+
+        for ip, port in self.outList:
+            oThread = OutThread(ip, port, self)
             oThread.start()
             self.outThreads[(ip,port)] = oThread
             print(self.outThreads.keys())
-        '''
+
         while True:
             self.tcpServer.listen()
             #print('Server: wait for new connection...')
@@ -66,7 +67,7 @@ class ClientThread(Thread):
 
 
 class OutThread(Thread):
-    def __init__(self, host, port, sock=None):
+    def __init__(self, host, port, server, sock=None):
         Thread.__init__(self)
         if sock is None:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -74,10 +75,11 @@ class OutThread(Thread):
             self.sock = sock
         self.host = host
         self.port = port
+        self.server = server
 
     def run(self):
         self.sock.connect((self.host, self.port))
-        print('Connection request -> {}:{}'.format(self.host, self.port))
+        print('Connection request -> {}:{}'.format(self.host,self.port))
         i = 0
         while True:
             try:
@@ -87,17 +89,20 @@ class OutThread(Thread):
                 if not res:
                     break
                 print(res.decode())
+                i += 1
+                time.sleep(2)
             except:
                 print('Connection Error - {}:{}'.format(self.host,self.port))
                 break
         self.sock.close()
         self.server.removeOThreads(self.host,self.port)
-        print('Connection closed - {}:{}'.format(self.ip,self.port))
+        print('Connection closed - {}:{}'.format(self.host,self.port))
 
 
 if __name__ == '__main__':
     SERVER_IP = '127.0.0.1'
-    SERVER_PORT = 20000
+    SERVER_PORT = 20001
+    outList = [(SERVER_IP, SERVER_PORT-1)]
 
-    s = ServerThread(SERVER_IP, SERVER_PORT)
+    s = ServerThread(SERVER_IP, SERVER_PORT, outList)
     s.start()
