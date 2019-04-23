@@ -1,8 +1,8 @@
-import socket, time
+import sys, socket, time
 from threading import Thread
 
 class ServerThread(Thread):
-    threads = {}
+    inThreads = {}
     outThreads = {}
     def __init__(self, ip, port, outList=[]):
         Thread.__init__(self)
@@ -24,15 +24,15 @@ class ServerThread(Thread):
             self.tcpServer.listen()
             #print('Server: wait for new connection...')
             (conn, (ip,port)) = self.tcpServer.accept()
-            cThread = ClientThread(ip, port, conn, self)
-            cThread.start()
-            self.threads[(ip,port)] = cThread
-            print(self.threads.keys())
+            iThread = InThread(ip, port, conn, self)
+            iThread.start()
+            self.inThreads[(ip,port)] = iThread
+            print(self.inThreads.keys())
 
-    def removeCThreads(self, ip, port):
-        d = dict(self.threads)
+    def removeIThreads(self, ip, port):
+        d = dict(self.inThreads)
         del d[(ip,port)]
-        self.threads = d
+        self.inThreads = d
 
     def removeOThreads(self, ip, port):
         d = dict(self.outThreads)
@@ -40,7 +40,7 @@ class ServerThread(Thread):
         self.outThreads = d
 
 
-class ClientThread(Thread):
+class InThread(Thread):
     def __init__(self, ip, port, sock, server):
         Thread.__init__(self)
         self.ip = ip
@@ -62,7 +62,7 @@ class ClientThread(Thread):
                 print('Connection Error - {}:{}'.format(self.ip,self.port))
                 break
         self.sock.close()
-        self.server.removeCThreads(self.ip,self.port)
+        self.server.removeIThreads(self.ip,self.port)
         print('Connection closed - {}:{}'.format(self.ip,self.port))
 
 
@@ -78,7 +78,11 @@ class OutThread(Thread):
         self.server = server
 
     def run(self):
-        self.sock.connect((self.host, self.port))
+        try:
+            self.sock.connect((self.host, self.port))
+        except:
+            print('Could not connect to {}.{}'.format(self.host, self.port))
+            thread.exit()
         print('Connection request -> {}:{}'.format(self.host,self.port))
         i = 0
         while True:
@@ -101,8 +105,22 @@ class OutThread(Thread):
 
 if __name__ == '__main__':
     SERVER_IP = '127.0.0.1'
-    SERVER_PORT = 20001
-    outList = [(SERVER_IP, SERVER_PORT-1)]
+    SERVER_PORT = 20000
 
-    s = ServerThread(SERVER_IP, SERVER_PORT, outList)
+    if len(sys.argv) > 0:
+        if sys.argv[1].isdigit():
+            SERVER_PORT = int(sys.argv[1])
+
+    outList = []
+    if SERVER_PORT > 20000:
+        for i in range(SERVER_PORT - 20000):
+            outList.append((SERVER_IP, 20000+i))
+
+    print(SERVER_PORT)
+    print(outList)
+    print(sys.argv)
+    if len(outList) > 0:
+        s = ServerThread(SERVER_IP, SERVER_PORT, outList)
+    else:
+        s = ServerThread(SERVER_IP, SERVER_PORT)
     s.start()
