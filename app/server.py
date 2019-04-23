@@ -1,15 +1,21 @@
-import sys, socket, time
+import sys, socket, time, json
 from threading import Thread
 
 class ServerThread(Thread):
     inThreads = {}
+    idRecord = {}
     outThreads = {}
+    isCo = False
     def __init__(self, ip, port, outList=[]):
         Thread.__init__(self)
         self.tcpServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.tcpServer.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.tcpServer.bind((SERVER_IP, SERVER_PORT))
+        self.tcpServer.bind((ip, port))
         self.outList = outList
+        self.ip = ip
+        self.port = port
+        if len(outList) == 0:
+            self.isCo = True
 
     def run(self):
         print('[+] New server thread start')
@@ -39,6 +45,29 @@ class ServerThread(Thread):
         del d[(ip,port)]
         self.outThreads = d
 
+    def process(self, jsonMsg, inThread):
+        print(jsonMsg)
+        try:
+            msg = json.loads(jsonMsg)
+        except:
+            print("msg")
+        ip = inThread.ip
+        port = inThread.port
+        cmd = msg['cmd']
+        print(cmd == 'save_id')
+        if cmd == 'save_id':
+            self.idRecord[(ip,port)] = msg['id']
+            print(self.isCo)
+            if self.isCo:
+                resMsg = {}
+                resMsg['cmd'] = 'set_co'
+                resMsg['co'] = self.port
+                print(resMsg['co'])
+                try:
+                    inThread.send(json.dumps(resMsg).encode())
+                except:
+                    print('!!!!!!!')
+        #elif cmd == ''
 
 class InThread(Thread):
     def __init__(self, ip, port, sock, server):
@@ -56,8 +85,9 @@ class InThread(Thread):
                 inData = self.sock.recv(8192)
                 if not inData:
                     break
+                self.server.process(inData.decode(), self)
                 print('Received: ', inData.decode())
-                self.sock.sendall(inData)
+                #self.send(inData)
             except:
                 print('Connection Error - {}:{}'.format(self.ip,self.port))
                 break
@@ -65,6 +95,8 @@ class InThread(Thread):
         self.server.removeIThreads(self.ip,self.port)
         print('Connection closed - {}:{}'.format(self.ip,self.port))
 
+    def send(self, msg):
+        self.sock.sendall(msg)
 
 class OutThread(Thread):
     def __init__(self, host, port, server, sock=None):
@@ -84,11 +116,13 @@ class OutThread(Thread):
             print('Could not connect to {}.{}'.format(self.host, self.port))
             thread.exit()
         print('Connection request -> {}:{}'.format(self.host,self.port))
+        msg = "{'cmd':'save_id', 'id':'" + str(self.port) + "'}"
+        self.sock.sendall(msg.encode())
         i = 0
         while True:
             try:
-                msg = 'Req: ' + str(i)
-                self.sock.sendall(msg.encode())
+                #msg = 'Req: ' + str(i)
+                #self.sock.sendall(msg.encode())
                 res = self.sock.recv(8192)
                 if not res:
                     break
@@ -107,7 +141,7 @@ if __name__ == '__main__':
     SERVER_IP = '127.0.0.1'
     SERVER_PORT = 20000
 
-    if len(sys.argv) > 0:
+    if len(sys.argv) > 1:
         if sys.argv[1].isdigit():
             SERVER_PORT = int(sys.argv[1])
 
