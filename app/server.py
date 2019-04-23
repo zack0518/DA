@@ -2,6 +2,9 @@ import sys, socket, time, json
 from threading import Thread
 from InThread import InThread
 from OutThread import OutThread
+from flask import Flask, request
+import flask
+app = Flask(__name__)
 
 # Server Thread
 # Start a new server by running a server thread
@@ -67,13 +70,14 @@ class ServerThread(Thread):
                 resMsg['co_port'] = self.port
                 ioThread.send(json.dumps(resMsg).encode())
         elif cmd == 'set_co':
-            print(type(msg['co_port']))
             self.coPort = msg['co_port']
         #elif cmd == 'req_token':
 
         #elif cmd == 'rel_token:'
 
-
+@app.route('/')
+def home():
+    return "Connected To Server"
 
 if __name__ == '__main__':
     SERVER_IP = '127.0.0.1'
@@ -93,3 +97,6 @@ if __name__ == '__main__':
     else:
         s = ServerThread(SERVER_IP, SERVER_PORT)
     s.start()
+
+    httpPort = 8080 + SERVER_PORT - 20000
+    app.run(host='127.0.0.1', debug=True, port=httpPort, use_reloader=False)
