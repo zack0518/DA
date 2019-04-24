@@ -23,23 +23,33 @@ class OutThread(Thread):
 
         msg = {}
         msg['cmd'] = 'set_id'
-        msg['id'] = self.port
+        msg['id'] = self.server.port
         self.send(json.dumps(msg).encode())
 
         while True:
-            try:
+            # try:
                 res = self.sock.recv(8192)
                 if not res:
                     break
+                # check if it's an election response
+                self.checkElectionResponse(res.decode())
                 print(res.decode())
                 self.server.process(res.decode(), self)
+            # except Exception as e:
+            #     print('Connection Error - {}:{}'.format(self.ip,self.port))
+            #     break
 
-            except:
-                print('Connection Error - {}:{}'.format(self.ip,self.port))
-                break
         self.sock.close()
         self.server.removeOThreads(self.ip,self.port)
         print('Connection closed - {}:{}'.format(self.ip,self.port))
 
+
+    def checkElectionResponse(self, jsonMsg):
+        msg = json.loads(jsonMsg)
+        if msg['cmd'] == 'disagree':
+            self.server.isReceived = True
+
+
     def send(self, msg):
         self.sock.sendall(msg)
+
