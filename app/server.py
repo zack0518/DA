@@ -109,7 +109,7 @@ class ServerThread(Thread):
             self.hasToken = True
 
         elif cmd == 'rel_token:':
-            if self.isCo and waitQueue.qsize != 0:
+            if self.isCo and self.waitQueue.qsize != 0:
                 t = self.waitQueue.get()
                 self.sendToken(t)
             else:
@@ -191,14 +191,14 @@ class ServerThread(Thread):
             self.election()
         # if itself is not coordinator request token
         elif not self.isCo:
-            coThread = self.outThreads[('127.0.0.1', self.coPort)]
+            coThread = self.outThreads[(self.ip, self.coPort)]
             coThread.send(json.dumps(resMsg).encode())
 
     """
     Check if the cooridinator is offline after send out msg
     """
     def isCoordinatorOffline(self):
-        coKey = ('127.0.0.1', self.coPort)
+        coKey = (self.ip, self.coPort)
         if coKey in self.outThreads or coKey in self.inThreads:
             return False
         return True
@@ -240,7 +240,7 @@ class ServerThread(Thread):
             print("releas token")
             resMsg = {}
             resMsg['cmd'] = 'rel_tokem'
-            coThread = self.outThreads[('127.0.0.1', self.coPort)]
+            coThread = self.outThreads[(self.ip, self.coPort)]
             coThread.send(json.dumps(resMsg).encode())
             self.hasToken = False
 
