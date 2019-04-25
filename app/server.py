@@ -1,4 +1,4 @@
-import sys, socket, time, json
+import sys, socket, time, json, queue
 from threading import Thread
 from InThread import InThread
 from OutThread import OutThread
@@ -9,11 +9,14 @@ global userData
 # Server Thread
 # Start a new server by running a server thread
 class ServerThread(Thread):
-    inThreads = {}  # Incoming socket threads {(ip,local_port): iThread}
-    idRecord = {}   # Thread ID records {(ip,local_port): thread_listening_port}
-    outThreads = {} # Outgoing socket threads {(ip,target_port): oThread}
-    isCo = False    # isCoordinator flag (default: False)
-    coPort = -1     # Coordinator port (default: -1)
+    inThreads = {}   # Incoming socket threads {(ip,local_port): iThread}
+    idRecord = {}    # Thread ID records {(ip,local_port): thread_listening_port}
+    outThreads = {}  # Outgoing socket threads {(ip,target_port): oThread}
+    isCo = False     # isCoordinator flag (default: False)
+    coPort = -1      # Coordinator port (default: -1)
+    hasToken = False # hasToken flag (default: False)
+
+    waitQueue = queue.Queue() # queue holding the server waiting for token
 
     def __init__(self, ip, port, outList=[]):
         Thread.__init__(self)
@@ -26,6 +29,8 @@ class ServerThread(Thread):
         self.isReceived = True
         if len(outList) == 0: # if outList is empty, set to be coordinator
             self.isCo = True
+            self.coPort = port
+            self.hasToken = True
 
     def run(self):
         print('[+] New server thread start')
@@ -95,9 +100,20 @@ class ServerThread(Thread):
             self.coPort = msg['co_port']
             print("Current coordinator is : ", self.coPort)
 
-            #elif cmd == 'req_token':
+        elif cmd == 'req_token':
+            if self.hasToken:
+                self.sendToken(ioThread)
 
-        #elif cmd == 'rel_token:'
+        elif cmd == 'token':
+            print("token recieved")
+            self.hasToken = True
+
+        elif cmd == 'rel_token:':
+            if self.isCo and waitQueue.qsize != 0:
+                t = self.waitQueue.get()
+                self.sendToken(t)
+            else:
+                self.hasToken = True
     """
     election section 
     If there is no connections, elect itself as the coordiantor
@@ -162,8 +178,9 @@ class ServerThread(Thread):
     This function sends request to the coordinator 
     Then checks the time interval between the sent message and received message
     """
-    def requestToCoordinate(self):
+    def requestToCoordinator(self):
 
+        print("request toekn to coordinator")
         resMsg = {}
         resMsg['cmd'] = 'req_token'
         # check if the coordinator is offline
@@ -186,15 +203,63 @@ class ServerThread(Thread):
             return False
         return True
 
-    def transferDetail(self, toAccount, amount):
+    def transfer(self, toAccount, amount):
+        global userAccount
+        global currentUser
+
         self.toAccount = toAccount
         self.amount = amount
         print('Recieved from client : {}:{}'.format(self.toAccount, self.amount))
+        
+        #change token
+        while not self.hasToken:
+            print('token not received yet')
+            # wait a time interval for token
+            time.sleep(1)
+            continue
+        #change data in js db
+        jsonDb = open('db.json', 'r')
+        data = json.load(jsonDb)
+        print(data)
+        jsonDb.close()
+
+        userB = float(data[userAccount]['balance'])
+        balance = str(userB - float(amount))
+        data[userAccount]['balance'] = balance
+        currentUser['balance'] = balance
+        toUserB = float(data[toAccount]["balance"])
+        data[toAccount]["balance"] = str(toUserB + float(amount))
+
+        jsonDb = open("db.json", "w+")
+        jsonDb.write(json.dumps(data))
+        jsonDb.close()
+
+        print("transfer success")
+        #release token to coordinator if not coordinator
+        if not self.isCo:
+            print("releas token")
+            resMsg = {}
+            resMsg['cmd'] = 'rel_tokem'
+            coThread = self.outThreads[('127.0.0.1', self.coPort)]
+            coThread.send(json.dumps(resMsg).encode())
+            self.hasToken = False
+
+    """
+    This function sends token to the server
+    """
+    def sendToken(self, ioThread):
+        self.waitQueue.put(ioThread)
+        t = self.waitQueue.get()
+        resMsg = {}
+        resMsg['cmd'] = 'token'
+        t.send(json.dumps(resMsg).encode())
+        print("Token sent to server: {}:{}".format(t.ip, t.port))
 
 """
 HTTP Request handler section
 """
-currrentUser = ""
+currentUser = ""
+userAccount = ""
 @app.route('/')
 def home():
     return "Connected To Server"
@@ -217,8 +282,10 @@ def loginQuery():
         return res
     else:
         user = userData[str(data['account'])]
-    global currrentUser
-    currrentUser= user
+    global currentUser
+    global userAccount
+    userAccount = str(data['account'])
+    currentUser= user
     if str(user['password']) == str(data['password']):
         res = "Login Success"
     else:
@@ -233,9 +300,9 @@ def loginQuery():
 
 @app.route('/balanceRequest', methods=["GET"])
 def balanceQuery():
-    global currrentUser
+    global currentUser
     q_res = {}
-    balance = currrentUser['balance']
+    balance = currentUser['balance']
     q_res['balance'] = balance
     res = flask.make_response(flask.jsonify(q_res))
     res.headers['Access-Control-Allow-Origin'] = '*'
@@ -253,9 +320,9 @@ def transferEvent():
     # get the request response
     data = json.loads(data)
     # ask for token
-    serverInstance.requestToCoordinate()
+    serverInstance.requestToCoordinator()
     print(data)
-    serverInstance.transferDetail(data['account'], data['amount'])
+    serverInstance.transfer(data['account'], data['amount'])
     q_res = {}
     res = flask.make_response(flask.jsonify(q_res))
     res.headers['Access-Control-Allow-Origin'] = '*'
