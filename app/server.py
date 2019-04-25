@@ -162,7 +162,7 @@ class ServerThread(Thread):
     This function sends request to the coordinator 
     Then checks the time interval between the sent message and received message
     """
-    def requestToCoodinate(self):
+    def requestToCoordinate(self):
 
         resMsg = {}
         resMsg['cmd'] = 'req_token'
@@ -253,7 +253,7 @@ def transferEvent():
     # get the request response
     data = json.loads(data)
     # ask for token
-    serverInstance.requestToCoodinate()
+    serverInstance.requestToCoordinate()
     print(data)
     serverInstance.transferDetail(data['account'], data['amount'])
     q_res = {}
