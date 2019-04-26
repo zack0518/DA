@@ -15,7 +15,6 @@ class ServerThread(Thread):
     isCo = False     # isCoordinator flag (default: False)
     coPort = -1      # Coordinator port (default: -1)
     hasToken = False # hasToken flag (default: False)
-
     waitQueue = queue.Queue() # queue holding the server waiting for token
 
     def __init__(self, ip, port, outList=[]):
@@ -109,7 +108,7 @@ class ServerThread(Thread):
             self.hasToken = True
 
         elif cmd == 'rel_token:':
-            if self.isCo and self.waitQueue.qsize != 0:
+            if self.isCo and waitQueue.qsize != 0:
                 t = self.waitQueue.get()
                 self.sendToken(t)
             else:
