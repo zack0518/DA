@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='m_cover.css') }}">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<script src="{{ url_for('static', filename='js/requestData.js') }}"></script>
+<body onload = "dataLoads();">
+<div id="invoice">
+    <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    	  <div class="modal-dialog">
+				<div class="loginmodal-container">
+					<h1>Enter Transaction Detail</h1><br>
+				  <form>
+					<input type="text" name="account" placeholder="Account" id="account">
+                      <input type="text" name="amount" placeholder="Amount" id="amount">
+					<input type="submit" name="login" class="login loginmodal-submit" value="Confirm" onclick="transfer();">
+				  </form>
+				</div>
+			</div>
+		  </div>
+
+    <div class="invoice overflow-auto">
+        <div style="min-width: 600px">
+            <header>
+                <div class="row">
+                    <div class="col">
+                        <h1  style="margin-left:20px;">  E-Banking </h1> &nbsp;&nbsp;&nbsp;&nbsp;
+                        <button id="transfer money" class="btn btn-primary active" data-toggle="modal" data-target="#login-modal"><i class="fa fa-print" ></i> Transfer</button>
+                    </div>
+                </div>
+            </header>
+            <main>
+                <div class="row contacts" style="margin-left:10px;">
+                    <div class="col invoice-to">
+                        <div class="text-gray-light"></div>
+                    </div>
+                </div>
+                <table border="0" cellspacing="0" cellpadding="0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th class="text-left">Account Number</th>
+                            <th class="text-right">Available</th>
+                            <th class="text-right">Current</th>
+                            <th class="text-right">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody onload="loadData()">
+                        <tr>
+                            <td class="no">01</td>
+                            <td class="text-left"><h3>
+                                <a target="_blank">
+                                Online Saver
+                                </a>
+                                </h3>
+                               Interest rate : 2.5%
+                            </td>
+                            <td class="unit" id = "available">$0.00</td>
+                            <td class="qty" id = "current">$0.00</td>
+                            <td class="total" id = "balance">$0.00</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+
+                        <tr>
+                            <td colspan="2"></td>
+                            <td colspan="2">TOTAL</td>
+                            <td id = "total">0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="notices">
+                    <div>DEAR Customer:</div>
+                    <div class="notice">Welcome to use our service</div>
+                </div>
+            </main>
+            <footer>
+               COMP90020 online banking system
+            </footer>
+        </div>
+        <!--DO NOT DELETE THIS div. IT is responsible for showing footer always at the bottom-->
+        <div></div>
+    </div>
+
+</body>
+</html>

@@ -2,20 +2,23 @@ import sys, socket, time, json, queue
 from threading import Thread
 from InThread import InThread
 from OutThread import OutThread
-from flask import Flask, request
+from flask import Flask, request, render_template
 import flask
+
 app = Flask(__name__)
 global userData
+
+
 # Server Thread
 # Start a new server by running a server thread
 class ServerThread(Thread):
-    inThreads = {}   # Incoming socket threads {(ip,local_port): iThread}
-    idRecord = {}    # Thread ID records {(ip,local_port): thread_listening_port}
+    inThreads = {}  # Incoming socket threads {(ip,local_port): iThread}
+    idRecord = {}  # Thread ID records {(ip,local_port): thread_listening_port}
     outThreads = {}  # Outgoing socket threads {(ip,target_port): oThread}
-    isCo = False     # isCoordinator flag (default: False)
-    coPort = -1      # Coordinator port (default: -1)
-    hasToken = False # hasToken flag (default: False)
-    waitQueue = queue.Queue() # queue holding the server waiting for token
+    isCo = False  # isCoordinator flag (default: False)
+    coPort = -1  # Coordinator port (default: -1)
+    hasToken = False  # hasToken flag (default: False)
+    waitQueue = queue.Queue()  # queue holding the server waiting for token
 
     def __init__(self, ip, port, outList=[]):
         Thread.__init__(self)
@@ -26,7 +29,7 @@ class ServerThread(Thread):
         self.port = port
         self.outList = outList
         self.isReceived = True
-        if len(outList) == 0: # if outList is empty, set to be coordinator
+        if len(outList) == 0:  # if outList is empty, set to be coordinator
             self.isCo = True
             self.coPort = port
             self.hasToken = True
@@ -38,30 +41,30 @@ class ServerThread(Thread):
         for ip, port in self.outList:
             oThread = OutThread(ip, port, self)
             oThread.start()
-            self.outThreads[(ip,port)] = oThread
-            print("self.outThreads ",self.outThreads)
+            self.outThreads[(ip, port)] = oThread
+            print("self.outThreads ", self.outThreads)
             print(self.outThreads.keys())
 
         # Create listener to accept incoming connections
         while True:
             self.tcpServer.listen()
-            (conn, (ip,port)) = self.tcpServer.accept()
+            (conn, (ip, port)) = self.tcpServer.accept()
             iThread = InThread(ip, port, conn, self)
             iThread.start()
-            self.inThreads[(ip,port)] = iThread
+            self.inThreads[(ip, port)] = iThread
             print("self.inThreads ", self.inThreads)
             print(self.inThreads.keys())
 
     # Remove an incoming connection from inThreads dict
     def removeIThreads(self, ip, port):
         d = dict(self.inThreads)
-        del d[(ip,port)]
+        del d[(ip, port)]
         self.inThreads = d
 
     # Remove an outgoing connection from outThreads dict
     def removeOThreads(self, ip, port):
         d = dict(self.outThreads)
-        del d[(ip,port)]
+        del d[(ip, port)]
         self.outThreads = d
 
     """
@@ -70,6 +73,7 @@ class ServerThread(Thread):
     set_id - the connected node port
     message at thie point will send to the original message sender
     """
+
     def process(self, jsonMsg, ioThread):
 
         msg = json.loads(jsonMsg)
@@ -78,7 +82,7 @@ class ServerThread(Thread):
         cmd = msg['cmd']
 
         if cmd == 'set_id':
-            self.idRecord[(ip,port)] = msg['id']
+            self.idRecord[(ip, port)] = msg['id']
             if self.isCo:
                 resMsg = {}
                 resMsg['cmd'] = 'set_co'
@@ -113,12 +117,14 @@ class ServerThread(Thread):
                 self.sendToken(t)
             else:
                 self.hasToken = True
+
     """
     election section 
     If there is no connections, elect itself as the coordiantor
     If P has the highest process id, it sends a Victory message to all other processes and becomes the new Coordinator. 
     Otherwise, P broadcasts an Election message to all other processes with higher process IDs than itself.
     """
+
     def election(self):
         msg = {}
         msg['cmd'] = 'election'
@@ -163,6 +169,7 @@ class ServerThread(Thread):
     """
     broadcast a victory message
     """
+
     def broadCastVicMsg(self, inList, outList):
         msg = {}
         msg['cmd'] = 'victory'
@@ -177,6 +184,7 @@ class ServerThread(Thread):
     This function sends request to the coordinator 
     Then checks the time interval between the sent message and received message
     """
+
     def requestToCoordinator(self):
 
         print("request toekn to coordinator")
@@ -196,6 +204,7 @@ class ServerThread(Thread):
     """
     Check if the cooridinator is offline after send out msg
     """
+
     def isCoordinatorOffline(self):
         coKey = (self.ip, self.coPort)
         if coKey in self.outThreads or coKey in self.inThreads:
@@ -209,14 +218,14 @@ class ServerThread(Thread):
         self.toAccount = toAccount
         self.amount = amount
         print('Recieved from client : {}:{}'.format(self.toAccount, self.amount))
-        
-        #change token
+
+        # change token
         while not self.hasToken:
             print('token not received yet')
             # wait a time interval for token
             time.sleep(1)
             continue
-        #change data in js db
+        # change data in js db
         jsonDb = open('db.json', 'r')
         data = json.load(jsonDb)
         print(data)
@@ -234,7 +243,7 @@ class ServerThread(Thread):
         jsonDb.close()
 
         print("transfer success")
-        #release token to coordinator if not coordinator
+        # release token to coordinator if not coordinator
         if not self.isCo:
             print("releas token")
             resMsg = {}
@@ -246,6 +255,7 @@ class ServerThread(Thread):
     """
     This function sends token to the server
     """
+
     def sendToken(self, ioThread):
         self.waitQueue.put(ioThread)
         t = self.waitQueue.get()
@@ -254,14 +264,22 @@ class ServerThread(Thread):
         t.send(json.dumps(resMsg).encode())
         print("Token sent to server: {}:{}".format(t.ip, t.port))
 
+
 """
 HTTP Request handler section
 """
 currentUser = ""
 userAccount = ""
-@app.route('/')
+
+@app.route('/index')
 def home():
-    return "Connected To Server"
+    return render_template('index.html')
+
+
+@app.route('/bankPage')
+def bankPage():
+    return render_template('e_bank.html')
+
 
 @app.route('/loginInfo', methods=["POST"])
 def loginQuery():
@@ -284,7 +302,7 @@ def loginQuery():
     global currentUser
     global userAccount
     userAccount = str(data['account'])
-    currentUser= user
+    currentUser = user
     if str(user['password']) == str(data['password']):
         res = "Login Success"
     else:
@@ -296,6 +314,7 @@ def loginQuery():
     res.headers['Access-Control-Allow-Methods'] = 'POST'
     res.headers['Access-Control-Allow-Headers'] = 'x-requested-with,content-type'
     return res
+
 
 @app.route('/balanceRequest', methods=["GET"])
 def balanceQuery():
@@ -309,9 +328,12 @@ def balanceQuery():
     res.headers['Access-Control-Allow-Headers'] = 'x-requested-with,content-type'
     return res
 
+
 """
 handel transfer event , ask for token 
 """
+
+
 @app.route('/transferEvent', methods=["POST"])
 def transferEvent():
     data = request.get_data()
@@ -328,6 +350,7 @@ def transferEvent():
     res.headers['Access-Control-Allow-Methods'] = 'GET'
     res.headers['Access-Control-Allow-Headers'] = 'x-requested-with,content-type'
     return res
+
 
 if __name__ == '__main__':
     """
@@ -351,8 +374,8 @@ if __name__ == '__main__':
     """
     outList = []
     if SERVER_PORT > 20000:
-        for i in range(SERVER_PORT-20000):
-            outList.append((SERVER_IP, 20000+i))
+        for i in range(SERVER_PORT - 20000):
+            outList.append((SERVER_IP, 20000 + i))
     """
     Initial the sever with the outgoing list
     """
@@ -367,4 +390,4 @@ if __name__ == '__main__':
     """
     httpPort = 8080 + SERVER_PORT - 20000
     print('# http port number ', httpPort)
-    app.run(host='127.0.0.1', debug = True, port=httpPort, use_reloader=False)
+    app.run(host='127.0.0.1', debug=True, port=httpPort, use_reloader=False)
