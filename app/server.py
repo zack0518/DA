@@ -319,8 +319,11 @@ def loginQuery():
 @app.route('/balanceRequest', methods=["GET"])
 def balanceQuery():
     global currentUser
+    global userAccount
     q_res = {}
-    balance = currentUser['balance']
+    with open("db.json") as db:
+        userData = json.load(db)
+    balance = userData[userAccount]['balance']
     q_res['balance'] = balance
     res = flask.make_response(flask.jsonify(q_res))
     res.headers['Access-Control-Allow-Origin'] = '*'
