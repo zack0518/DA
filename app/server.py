@@ -162,6 +162,8 @@ class ServerThread(Thread):
         # then it broadcasts a Victory message to all other processes and becomes the Coordinator
         if len(higherIDs) == 0 or self.isReceived == False:
             self.coPort = self.port
+            self.isCo = True
+            self.hasToken = True
             self.broadCastVicMsg(inList, outList)
         self.isReceived = True
         print("Current coordinator is : ", self.coPort)
@@ -187,6 +189,11 @@ class ServerThread(Thread):
 
     def requestToCoordinator(self):
 
+        #if this server is coordinator, return True
+        #No need to request Token
+        if self.isCo:
+            return True
+
         print("request toekn to coordinator")
         resMsg = {}
         resMsg['cmd'] = 'req_token'
@@ -196,10 +203,12 @@ class ServerThread(Thread):
         if self.isCoordinatorOffline() and not self.isCo:
             print("Coordinator offline, start election")
             self.election()
+            return False
         # if itself is not coordinator request token
         elif not self.isCo:
             coThread = self.outThreads[(self.ip, self.coPort)]
             coThread.send(json.dumps(resMsg).encode())
+            return True
 
     """
     Check if the cooridinator is offline after send out msg
@@ -344,7 +353,7 @@ def transferEvent():
     # get the request response
     data = json.loads(data)
     # ask for token
-    serverInstance.requestToCoordinator()
+    while not serverInstance.requestToCoordinator(): continue
     print(data)
     serverInstance.transfer(data['account'], data['amount'])
     q_res = {}
