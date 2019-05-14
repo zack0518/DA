@@ -67,12 +67,13 @@
     <session id="-496486609">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="3" />
+          <entry key="project.closed" value="4" />
           <entry key="project.open.time.0" value="2" />
-          <entry key="project.open.time.1" value="1" />
+          <entry key="project.open.time.1" value="2" />
+          <entry key="project.open.time.2" value="1" />
           <entry key="project.open.time.8" value="1" />
           <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="5" />
+          <entry key="project.opened" value="7" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
@@ -80,7 +81,7 @@
           <entry key="css" value="2" />
           <entry key="html" value="26" />
           <entry key="js" value="101" />
-          <entry key="py" value="111" />
+          <entry key="py" value="408" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
@@ -88,7 +89,7 @@
           <entry key="CSS" value="2" />
           <entry key="HTML" value="26" />
           <entry key="JavaScript" value="101" />
-          <entry key="Python" value="111" />
+          <entry key="Python" value="408" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -116,7 +117,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/InThread.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
+            <state relative-caret-position="495">
               <caret line="33" column="67" selection-start-line="33" selection-start-column="35" selection-end-line="33" selection-end-column="67" />
               <folding>
                 <element signature="e#0#30#0" expanded="true" />
@@ -128,8 +129,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="245">
-              <caret line="324" column="32" selection-start-line="324" selection-start-column="32" selection-end-line="324" selection-end-column="32" />
+            <state relative-caret-position="95">
+              <caret line="261" column="57" selection-start-line="261" selection-start-column="57" selection-end-line="261" selection-end-column="57" />
             </state>
           </provider>
         </entry>
@@ -137,7 +138,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/flask/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-4485">
+            <state relative-caret-position="26535">
               <caret line="1798" selection-start-line="1798" selection-end-line="1798" />
             </state>
           </provider>
@@ -147,7 +148,7 @@
         <entry file="file://$PROJECT_DIR$/db.json">
           <provider selected="true" editor-type-id="text-editor">
             <state>
-              <caret column="34" selection-start-column="34" selection-end-column="34" />
+              <caret column="36" selection-start-column="36" selection-end-column="36" />
             </state>
           </provider>
         </entry>
@@ -228,6 +229,12 @@
       <find>url</find>
       <find>currentUser</find>
       <find>with</find>
+      <find>isCoordinatorOffline</find>
+      <find>serverInstance.requestToCoordinator()</find>
+      <find>election()</find>
+      <find>token</find>
+      <find>requestToCoordinator()</find>
+      <find>userB</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -251,7 +258,7 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="57" />
+    <option name="x" value="52" />
     <option name="y" value="23" />
     <option name="width" value="1316" />
     <option name="height" value="808" />
@@ -292,6 +299,17 @@
             <path>
               <item name="app" type="b2602c69:ProjectViewProjectNode" />
               <item name="app" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="static" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="static" type="462c0819:PsiDirectoryNode" />
+              <item name="js" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="app" type="b2602c69:ProjectViewProjectNode" />
@@ -430,7 +448,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="58" y="23" width="1316" height="808" extended-state="0" />
+    <frame x="52" y="23" width="1316" height="808" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2061776" />
@@ -438,14 +456,14 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4980695" visible="true" weight="0.349162" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.8208494" weight="0.19692737" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.25977653" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.4996139" weight="0.32960895" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.4988417" weight="0.32960895" />
-      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5019305" side_tool="true" visible="true" weight="0.349162" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.17915058" side_tool="true" visible="true" weight="0.19692737" />
       <window_info anchor="bottom" id="Python Console" order="10" sideWeight="0.4996139" weight="0.3282123" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -480,7 +498,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/InThread.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
+        <state relative-caret-position="495">
           <caret line="33" column="67" selection-start-line="33" selection-start-column="35" selection-end-line="33" selection-end-column="67" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
@@ -488,10 +506,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/flask/app.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="26535">
+          <caret line="1798" selection-start-line="1798" selection-end-line="1798" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/db.json">
       <provider selected="true" editor-type-id="text-editor">
         <state>
-          <caret column="34" selection-start-column="34" selection-end-column="34" />
+          <caret column="36" selection-start-column="36" selection-end-column="36" />
         </state>
       </provider>
     </entry>
@@ -530,17 +555,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/flask/app.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4485">
-          <caret line="1798" selection-start-line="1798" selection-end-line="1798" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="245">
-          <caret line="324" column="32" selection-start-line="324" selection-start-column="32" selection-end-line="324" selection-end-column="32" />
+        <state relative-caret-position="95">
+          <caret line="261" column="57" selection-start-line="261" selection-start-column="57" selection-end-line="261" selection-end-column="57" />
         </state>
       </provider>
     </entry>

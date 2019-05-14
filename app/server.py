@@ -171,7 +171,6 @@ class ServerThread(Thread):
     """
     broadcast a victory message
     """
-
     def broadCastVicMsg(self, inList, outList):
         msg = {}
         msg['cmd'] = 'victory'
@@ -186,7 +185,6 @@ class ServerThread(Thread):
     This function sends request to the coordinator 
     Then checks the time interval between the sent message and received message
     """
-
     def requestToCoordinator(self):
 
         #if this server is coordinator, return True
@@ -229,17 +227,22 @@ class ServerThread(Thread):
         print('Recieved from client : {}:{}'.format(self.toAccount, self.amount))
 
         # change token
+        rec_count = 0
         while not self.hasToken:
             print('token not received yet')
             # wait a time interval for token
             time.sleep(1)
+            if not self.hasToken:
+                if rec_count > 1:
+                    rec_count = rec_count + 1
+                    self.requestToCoordinator()
+                else:
+                    break
             continue
         # change data in js db
         jsonDb = open('db.json', 'r')
         data = json.load(jsonDb)
-        print(data)
         jsonDb.close()
-
         userB = float(data[userAccount]['balance'])
         balance = str(userB - float(amount))
         data[userAccount]['balance'] = balance
@@ -251,15 +254,25 @@ class ServerThread(Thread):
         jsonDb.write(json.dumps(data))
         jsonDb.close()
 
-        print("transfer success")
+        print("writing success")
         # release token to coordinator if not coordinator
         if not self.isCo:
-            print("releas token")
             resMsg = {}
-            resMsg['cmd'] = 'rel_tokem'
-            coThread = self.outThreads[(self.ip, self.coPort)]
-            coThread.send(json.dumps(resMsg).encode())
-            self.hasToken = False
+            resMsg['cmd'] = 'rel_token'
+            print("Release token to coordinator ", self.coPort)
+            try:
+                coThread = self.outThreads[(self.ip, self.coPort)]
+                coThread.send(json.dumps(resMsg).encode())
+                self.hasToken = False
+            except KeyError:
+                inList = [self.inThreads[k] for k in self.inThreads.keys() if self.inThreads[k].port]
+                for i in inList:
+                    localPort = self.idRecord.get(i.port)
+                    if localPort == self.coPort:
+                        coThread = self.outThreads[(self.ip, i.port)]
+                        coThread.send(json.dumps(resMsg).encode())
+                        self.hasToken = False
+                        return
 
     """
     This function sends token to the server
@@ -344,8 +357,6 @@ def balanceQuery():
 """
 handel transfer event , ask for token 
 """
-
-
 @app.route('/transferEvent', methods=["POST"])
 def transferEvent():
     data = request.get_data()
@@ -353,7 +364,8 @@ def transferEvent():
     # get the request response
     data = json.loads(data)
     # ask for token
-    while not serverInstance.requestToCoordinator(): continue
+    serverInstance.requestToCoordinator()
+    time.sleep(1)
     print(data)
     serverInstance.transfer(data['account'], data['amount'])
     q_res = {}
