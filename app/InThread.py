@@ -24,11 +24,7 @@ class InThread(Thread):
                 self.checkElectionResponse(inData.decode())
                 self.server.process(inData.decode(), self)
                 print('Received: ', inData.decode())
-                #self.send(inData)
-            # except Exception as e:
-            #     print('Connection Error - {}:{}'.format(self.ip,self.port))
-            #
-            #     break
+
         self.sock.close()
         self.server.removeIThreads(self.ip, self.port)
         print('Connection closed - {}:{}'.format(self.ip,self.port))

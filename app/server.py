@@ -153,7 +153,6 @@ class ServerThread(Thread):
                     targetThread = self.inThreads[ip_port]
                     targetThread.send(json.dumps(msg).encode())
 
-        print("# isReceived ", self.isReceived)
         # wait a time interval for response
         time.sleep(1)
         # If higherId list is empty it means that the current P has the highest process id,
@@ -229,7 +228,6 @@ class ServerThread(Thread):
         # change token
         rec_count = 0
         while not self.hasToken:
-            print('token not received yet')
             # wait a time interval for token
             time.sleep(1)
             if not self.hasToken:

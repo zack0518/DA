@@ -35,9 +35,6 @@ class OutThread(Thread):
                 self.checkElectionResponse(res.decode())
                 print(res.decode())
                 self.server.process(res.decode(), self)
-            # except Exception as e:
-            #     print('Connection Error - {}:{}'.format(self.ip,self.port))
-            #     break
 
         self.sock.close()
         self.server.removeOThreads(self.ip,self.port)
